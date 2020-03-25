@@ -4,10 +4,10 @@ This a trust region policy optimizatio implementation for continues action space
 
 ## Experiments
 
-![bacth_size](https://github.com/MEfeTiryaki/trpo/tree/master/fig/bacht_size.png)
+![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/bacht_size.png)
 
-![bacth_size](https://github.com/MEfeTiryaki/trpo/tree/master/fig/memory.png)
+![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/memory.png)
 
-![bacth_size](https://github.com/MEfeTiryaki/trpo/tree/master/fig/td_mc.png)
+![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/td_mc.png)
 
-![bacth_size](https://github.com/MEfeTiryaki/trpo/tree/master/fig/value_iter_max.png)
+![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/value_iter_max.png)
