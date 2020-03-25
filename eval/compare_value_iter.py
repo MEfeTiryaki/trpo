@@ -5,6 +5,8 @@ import glob
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
+figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 
 def main():
     # print("/home/efe/git/trpo/"+args.log_dir+"*.csv")

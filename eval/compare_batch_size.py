@@ -5,11 +5,14 @@ import glob
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
+figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 
 def main():
     # print("/home/efe/git/trpo/"+args.log_dir+"*.csv")
 
-    for log_dir in ["log/td"
+    for log_dir in ["log/td/batch_size/_2500"
+                   ,"log/td"
                    ,"log/td/batch_size/_10000"
                    ,"log/td/batch_size/_20000"
                    ]:
@@ -36,7 +39,7 @@ def main():
         plt.fill_between(episode,mean-std, mean+std, alpha=0.2)
     plt.xlabel("Iteration Number")
     plt.ylabel("Average Total Reward (for 10 run)")
-    plt.legend(["5k","10k","20k"])
+    plt.legend(["2.5k","5k","10k","20k"])
     plt.grid()
     plt.show()
 
