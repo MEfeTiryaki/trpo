@@ -1,10 +1,9 @@
-<script type="text/javascript" async
-src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js? 
-config=TeX-MML-AM_CHTML"
-</script>
 # Trust Region Policy Optimization
 
 This a trust region policy optimizatio implementation for continues action space system.
+
+
+
 
 ## Useful Referece
 ### Books
@@ -36,12 +35,13 @@ In this experiment, two different way of estimating return is compared.
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/td_mc.png)
 
 ### Value function training batch
-In this experiment, we train the system with 3 different batch sizes. 
+In this experiment, we train the system with 4 different batch sizes. 
 
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/bacht_size.png)
 
 
 ### Past data for value learning
+In ![\*](http://papers.nips.cc/paper/7233-towards-generalization-and-simplicity-in-continuous-control.pdf), they used previous batches data to train the value function to avoid overfitting. ![\*](https://github.com/pat-coady/trpo) used the previous+current batch to train the value function. Here, we are testing different combinations of both to see difference.
 
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/memory.png)
 
