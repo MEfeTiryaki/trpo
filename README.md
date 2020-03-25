@@ -1,6 +1,6 @@
 # Trust Region Policy Optimization
 
-This a trust region policy optimizatio implementation for continues action space system.
+This a trust region policy optimizatio implementation for continues action space system. This repo uses some methods from ![\*](https://github.com/ikostrikov/pytorch-trpo). 
 
 
 
@@ -23,8 +23,16 @@ This a trust region policy optimizatio implementation for continues action space
 
 If there are some other good implementations please inform me to add to the list
 
-## Experiments
+## Results
 
+* Bootstrapping works way better 
+* Increasing batch size increases the learning rate but simulations takes to long time
+* Training policy and value networks with data from same time step results a poor learning performance, even if the value training perform after policy optimization. Training value function with previous data solves the problem. Using more than one previous batch does not improve the results.
+* High the value training iteration number results overfitting, and low cause poor learning. Though, this experiments are performed with minibatches with size batch_size/iter, namely minibatch size is not constant.(TODO: add constant batch) 
+
+
+## Experiments
+The experiments are performed in Pendulum-v0 environment
 ### Monte Carlo vs Bootstrap
 In this experiment, two different way of estimating return is compared.
 
