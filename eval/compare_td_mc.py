@@ -9,10 +9,8 @@ import matplotlib.pyplot as plt
 def main():
     # print("/home/efe/git/trpo/"+args.log_dir+"*.csv")
 
-    for log_dir in ["log/mc","log/td"
-                   ,"log/td/batch_size/_10000"
-                   ,"log/td/batch_size/_20000"
-                   ,"log/td/value_iter/_100"]:
+    for log_dir in ["log/mc"
+                   ,"log/td"]:
         filenames = glob.glob(log_dir+"/*.csv")
         print(len(filenames))
 
@@ -33,10 +31,10 @@ def main():
         plt.plot(episode,mean)
 
 
-        plt.fill_between(episode,mean-std, mean+std, alpha=0.5)
+        plt.fill_between(episode,mean-std, mean+std, alpha=0.2)
     plt.xlabel("Iteration Number")
     plt.ylabel("Average Total Reward (for 10 run)")
-    plt.legend(["Monte Carlo","Bootstrap 5k","Bootstrap 10k","Bootstrap 20k"])
+    plt.legend(["Monte Carlo","Bootstrap"])
     plt.grid()
     plt.show()
 

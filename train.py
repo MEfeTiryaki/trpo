@@ -105,18 +105,10 @@ def prepare_data(batch,valueBatch,previousBatch):
     advantagesList = torch.cat(advantagesList,0)
     batch["advantages"] = (advantagesList- advantagesList.mean()) / advantagesList.std()
 
-
-    states = batch["states"]
-    targets = batch["returns"]
-
-    if(len(previousBatch["states"])!= 0 ):
-        previousState = previousBatch["states"]
-        previousTargets = previousBatch["returns"]
-        states  = torch.cat((previousState,states),0)
-        targets  = torch.cat((previousTargets,targets),0)
-
-    valueBatch["states"] = states
-    valueBatch["targets"] = targets
+    valueBatch["states"] = torch.cat(( previousBatch["states"],batch["states"]),0)
+    valueBatch["targets"] =  torch.cat((previousBatch["returns"],batch["returns"]),0)
+    # valueBatch["states"] =  previousBatch["states"]
+    # valueBatch["targets"] = previousBatch["returns"]
 
 def update_policy(batch):
     advantages = batch["advantages"]
@@ -160,6 +152,29 @@ def calculate_loss(reward_sum_mean,reward_sum_std,test_number = 10):
     reward_sum_std.append(np.array(rewardSum).std())
     return reward_sum_mean, reward_sum_std
 
+
+def save_to_previousBatch(previousBatch,batch):
+    if args.value_memory<0:
+        print("Value memory should be equal or greater than zero")
+    elif args.value_memory>0:
+        if previousBatch["returns"].size() == 0:
+            previousBatch= {"states":batch["states"],
+                            "returns":batch["returns"]}
+        else:
+            previous_size = previousBatch["returns"].size()[0]
+            size =  batch["returns"].size()[0]
+            if previous_size/size == args.value_memory:
+                previousBatch["states"] = torch.cat([previousBatch["states"][size:],batch["states"]],0)
+                previousBatch["returns"] = torch.cat([previousBatch["returns"][size:],batch["returns"]],0)
+            else:
+                previousBatch["states"] = torch.cat([previousBatch["states"],batch["states"]],0)
+                previousBatch["returns"] = torch.cat([previousBatch["returns"],batch["returns"]],0)
+    if args.value_memory_shuffle:
+        permutation = torch.randperm(previousBatch["returns"].size()[0])
+        previousBatch["states"] = previousBatch["states"][permutation]
+        previousBatch["returns"] = previousBatch["returns"][permutation]
+
+
 def signal_handler(sig, frame):
     print('Closing!!')
     env.close()
@@ -199,8 +214,8 @@ def main():
     time_start = time.time()
 
     reward_sum_mean,reward_sum_std  = [], []
-    previousBatch= {"states":[] ,
-                    "returns":[]}
+    previousBatch= {"states":torch.Tensor(0) ,
+                    "returns":torch.Tensor(0)}
 
     for i_episode in range(args.max_iteration_number):
         time_episode_start = time.time()
@@ -252,8 +267,10 @@ def main():
         prepare_data(batch,valueBatch,previousBatch)
         update_policy(batch) # First policy update to avoid overfitting
         update_value(valueBatch)
-        previousBatch= {"states":batch["states"] ,
-                        "returns":batch["returns"]}
+
+        save_to_previousBatch(previousBatch,batch)
+
+        print(type(previousBatch["returns"]) )
 
         print("episode %d | total: %.4f "%( i_episode, time.time()-time_episode_start))
         reward_sum_mean,reward_sum_std = calculate_loss(reward_sum_mean,reward_sum_std)
