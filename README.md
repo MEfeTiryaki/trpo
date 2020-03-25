@@ -47,4 +47,6 @@ In ![\*](http://papers.nips.cc/paper/7233-towards-generalization-and-simplicity-
 
 
 ### Value training iteration number
+We test the value training iteration number. The experiment is performed with the a batch size of 5k and the minibatch size are 5k/iter_num. 
+
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/value_iter_max.png)
