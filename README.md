@@ -3,7 +3,8 @@
 This a trust region policy optimization implementation for continues action space system. This repo uses some methods from ![\*](https://github.com/ikostrikov/pytorch-trpo). 
 
 
-
+## TODO
+* Experience Replay
 
 ## Useful Referece
 ### Books
