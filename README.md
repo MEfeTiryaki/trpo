@@ -1,10 +1,29 @@
 # Trust Region Policy Optimization
 
-This a trust region policy optimization implementation for continues action space system. This repo uses some methods from ![\*](https://github.com/ikostrikov/pytorch-trpo). 
+This a trust region policy optimization implementation for continues action space system. This repo uses some methods from ![\*](https://github.com/ikostrikov/pytorch-trpo).
 
 
 ## TODO
 * Experience Replay
+
+## Useful Flags
+
+* --max-iteration-number {int} : the max number of episode
+* --batch-size {int} : batch size of each episode
+* --episode-length {int} : length of each episode (Environmens may limit this internally for example Pendulum has length 200)
+
+* --log : if added at the end of the training the mean reward
+* --log-dir {string} : the logging directory
+* --log-prefix {string} : name your log file
+
+## Logging
+If the --log flag is added to the command line instruction, at the end of the
+training the average cummulative reward will be logged automatically.
+
+
+
+## Saving the trained networks
+
 
 ## Useful Referece
 ### Books
@@ -26,10 +45,10 @@ If there are some other good implementations please inform me to add to the list
 
 ## Results
 
-* Bootstrapping works way better 
+* Bootstrapping works way better
 * Increasing batch size increases the learning rate but simulations takes to long time
 * Training policy and value networks with data from same time step results a poor learning performance, even if the value training perform after policy optimization. Training value function with previous data solves the problem. Using more than one previous batch does not improve the results.
-* High the value training iteration number results overfitting, and low cause poor learning. Though, this experiments are performed with minibatches with size batch_size/iter, namely minibatch size is not constant.(TODO: add constant batch) 
+* High the value training iteration number results overfitting, and low cause poor learning. Though, this experiments are performed with minibatches with size batch_size/iter, namely minibatch size is not constant.(TODO: add constant batch)
 
 
 ## Experiments
@@ -44,7 +63,7 @@ In this experiment, two different way of estimating return is compared.
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/td_mc.png)
 
 ### Value function training batch
-In this experiment, we train the system with 4 different batch sizes. 
+In this experiment, we train the system with 4 different batch sizes.
 
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/bacht_size.png)
 
@@ -56,6 +75,6 @@ In ![\*](http://papers.nips.cc/paper/7233-towards-generalization-and-simplicity-
 
 
 ### Value training iteration number
-We test the value training iteration number. The experiment is performed with the a batch size of 5k and the minibatch size are 5k/iter_num. 
+We test the value training iteration number. The experiment is performed with the a batch size of 5k and the minibatch size are 5k/iter_num.
 
 ![bacth_size](https://github.com/MEfeTiryaki/trpo/blob/master/fig/value_iter_max.png)
