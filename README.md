@@ -9,6 +9,8 @@ This a trust region policy optimization implementation for continues action spac
 * Documentation : dependendies, how to save network
 * Experience Replay
 * Make code stupid proof : check log folders, save and load folders
+* Reward plotter for only one run
+* automatic log generation bash for the given plots
 
 ## Useful Flags
 
