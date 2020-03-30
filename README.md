@@ -8,6 +8,7 @@ This a trust region policy optimization implementation for continues action spac
 ## TODO
 * Documentation : dependendies, how to save network
 * Experience Replay
+* Make code stupid proof : check log folders, save and load folders
 
 ## Useful Flags
 
