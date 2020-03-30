@@ -11,6 +11,7 @@ This a trust region policy optimization implementation for continues action spac
 * Make code stupid proof : check log folders, save and load folders
 * Reward plotter for only one run
 * automatic log generation bash for the given plots
+* various minimal examples 
 
 ## Useful Flags
 
