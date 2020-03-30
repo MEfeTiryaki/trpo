@@ -6,7 +6,7 @@ This a trust region policy optimization implementation for continues action spac
 
 
 ## TODO
-* Documentation : dependendies, how to save 
+* Documentation : dependendies, how to save network
 * Experience Replay
 
 ## Useful Flags
@@ -23,7 +23,19 @@ This a trust region policy optimization implementation for continues action spac
 If the --log flag is added to the command line instruction, at the end of the
 training the average cummulative reward will be logged automatically.
 
+Recommended way of logging:
 
+First create a log directory
+```bash
+  mkdir log
+  mkdir log/example
+```
+Then run the train.py
+```bash
+  python train.py --log -log-dir "log/example"
+```
+the log file will appear in the given folder. If you run the same command multiple time,
+the log code will automatically enumurate the log file names.
 
 ## Saving the trained networks
 
