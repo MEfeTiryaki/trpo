@@ -51,6 +51,7 @@ parser.add_argument('--max-iteration-number', type=int, default=200, metavar='N'
 parser.add_argument('--render', action='store_true', help='render the environment')
 # Logging
 parser.add_argument('--log-interval', type=int, default=1, metavar='N', help='interval between training status logs (default: 10)')
+parser.add_argument('--log', action='store_true', help='log the results at the end')
 parser.add_argument('--log-dir', type=str, default=".", metavar='N', help='log directory')
 parser.add_argument('--log-prefix', type=str, default="log", metavar='N', help='log file prefix')
 
@@ -187,8 +188,6 @@ def update_value(valueBatch):
         loss.backward()
         optimizer.step()
 
-
-
 def save_to_previousBatch(previousBatch,batch):
     """ Save previous batch to use in future value optimization
     Details: TODO
@@ -215,7 +214,6 @@ def save_to_previousBatch(previousBatch,batch):
         previousBatch["states"] = previousBatch["states"][permutation]
         previousBatch["returns"] = previousBatch["returns"][permutation]
 
-
 def calculate_loss(reward_sum_mean,reward_sum_std,test_number = 10):
     """ Calculate mean cummulative reward for test_nubmer of trials
 
@@ -241,7 +239,7 @@ def calculate_loss(reward_sum_mean,reward_sum_std,test_number = 10):
     reward_sum_std.append(np.array(rewardSum).std())
     return reward_sum_mean, reward_sum_std
 
-def log(losses):
+def log(rewards):
     """ Saves mean and std over episodes in log file
     Parameters:
     Returns:
@@ -268,11 +266,17 @@ def log(losses):
 
     import csv
     filename = filename+ ".csv"
-    with open(filename, 'w', newline='') as csvfile:
-        spamwriter = csv.writer(csvfile, delimiter=' ',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow(losses)
-
+    pythonVersion = sys.version_info[0]
+    if pythonVersion == 3:
+        with open(filename, 'w', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=' ',
+                                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            spamwriter.writerow(rewards)
+    elif pythonVersion == 2:
+        with open(filename, 'w', ) as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=' ',
+                                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            spamwriter.writerow(rewards)
 def main():
     """
     Parameters:
@@ -345,7 +349,10 @@ def main():
         reward_sum_mean,reward_sum_std = calculate_loss(reward_sum_mean,reward_sum_std)
         print("\tloss | mean : %6.4f / std : %6.4f"%(reward_sum_mean[-1],reward_sum_std[-1])  )
 
-    log(reward_sum_mean)
+    if args.log:
+        print("Data is logged in "+args.log_dir+"/")
+        log(reward_sum_mean)
+
     print("Total training duration: %.4f "%(time.time()-time_start))
 
     env.close()
