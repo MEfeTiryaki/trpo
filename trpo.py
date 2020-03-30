@@ -12,24 +12,28 @@ def getSurrogateloss(model,states,actions,advantages,logProbabilityOld):
 
 def FisherVectorProduct(v , model, states, actions,logProbabilityOld,damping):
     kl = model.meanKlDivergence(states, actions,logProbabilityOld)
-    # print("kl\n" ,kl)
+
     grads = torch.autograd.grad(kl, model.parameters()
                     ,retain_graph=True, create_graph=True)
     flat_grad_kl = torch.cat([grad.view(-1) for grad in grads])
+
     kl_v = (flat_grad_kl * v).sum()
     grads = torch.autograd.grad(kl_v, model.parameters())
     flat_grad_grad_kl = torch.cat([grad.contiguous().view(-1)
                                     for grad in grads]).data
+
     return flat_grad_grad_kl + v * damping
 
-def trpo_step(model, states, actions, advantages,logProbabilityOld, max_kl, damping):
+def trpo_step(model, states, actions, advantages, max_kl, damping):
 
+    fixed_log_prob = model.getLogProbabilityDensity(Variable(states),actions).detach()
     get_loss = lambda x: getSurrogateloss(x,
                                     states,
                                     actions,
                                     advantages,
-                                    logProbabilityOld)
+                                    fixed_log_prob)
     loss = get_loss(model)
+
     grads = torch.autograd.grad(loss, model.parameters())
     loss_grad = torch.cat([grad.view(-1) for grad in grads])
 
@@ -37,10 +41,12 @@ def trpo_step(model, states, actions, advantages,logProbabilityOld, max_kl, damp
                                         model,
                                         states,
                                         actions,
-                                        logProbabilityOld,
+                                        fixed_log_prob,
                                         damping)
 
     stepdir = conjugate_gradients(Fvp, -loss_grad, 10)
+
+
     shs = 0.5 * (stepdir * Fvp(stepdir)).sum(0, keepdim=True)
     lm = torch.sqrt(shs / max_kl)
     fullstep = stepdir / lm[0]
@@ -49,6 +55,7 @@ def trpo_step(model, states, actions, advantages,logProbabilityOld, max_kl, damp
     success, new_params = linesearch(model, get_loss, prev_params, fullstep,
                                      neggdotstepdir / lm[0])
     set_flat_params_to(model, new_params)
+
     return loss
 
 def conjugate_gradients(Avp, b, nsteps, residual_tol=1e-10):
@@ -65,9 +72,9 @@ def conjugate_gradients(Avp, b, nsteps, residual_tol=1e-10):
         betta = new_rdotr / rdotr
         p = r + betta * p
         rdotr = new_rdotr
+        t= i
         if rdotr < residual_tol:
             break
-
     return x
 
 def linesearch(model,
@@ -90,5 +97,6 @@ def linesearch(model,
 
         if ratio.item() > accept_ratio and actual_improve.item() > 0:
             # print("\tfval after", newfval.item())
+            # print("\tlog(std): %f"%xnew[0])
             return True, xnew
     return False, x

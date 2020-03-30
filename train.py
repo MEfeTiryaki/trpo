@@ -54,6 +54,12 @@ parser.add_argument('--log-interval', type=int, default=1, metavar='N', help='in
 parser.add_argument('--log-dir', type=str, default=".", metavar='N', help='log directory')
 parser.add_argument('--log-prefix', type=str, default="log", metavar='N', help='log file prefix')
 
+# Load
+parser.add_argument('--load', action='store_true', help='load models')
+parser.add_argument('--save', action='store_true', help='load models')
+parser.add_argument('--load-dir', type=str, default=".", metavar='N', help='')
+
+
 args = parser.parse_args()
 
 env = gym.make(args.env_name)
@@ -61,11 +67,45 @@ env.seed(args.seed)
 num_inputs = env.observation_space.shape[0]
 num_actions = env.action_space.shape[0]
 
-policy_net = Policy(num_inputs, num_actions,30)
-value_net = Value(num_inputs,30)
+torch.set_printoptions(profile="full")
 
+if args.load:
+    policy_net = Policy(num_inputs, num_actions,30)
+    value_net = Value(num_inputs,30)
+    set_flat_params_to(value_net, loadParameterCsv(args.load_dir+"/ValueNet"))
+    set_flat_params_to(policy_net, loadParameterCsv(args.load_dir+"/PolicyNet"))
+    print("Networks are loaded from "+args.load_dir+"/")
+else:
+    policy_net = Policy(num_inputs, num_actions,30)
+    value_net = Value(num_inputs,30)
+
+def signal_handler(sig, frame):
+    """ Signal Handler to save the networks when shutting down via ctrl+C
+    Parameters:
+    Returns:
+    """
+    if(args.save):
+        valueParam = get_flat_params_from(value_net)
+        policyParam = get_flat_params_from(policy_net)
+        saveParameterCsv(valueParam,args.load_dir+"/ValueNet")
+        saveParameterCsv(policyParam,args.load_dir+"/PolicyNet")
+        print("Networks are saved in "+args.load_dir+"/")
+
+    print('Closing!!')
+    env.close()
+    sys.exit(0)
 
 def prepare_data(batch,valueBatch,previousBatch):
+    """ Get the batch data and calculate value,return and generalized advantage
+    Detail: TODO
+    Parameters:
+    batch (dict of arrays of numpy) : TODO
+    valueBatch  (dict of arrays of numpy) : TODO
+    previousBatch (dict of arrays of numpy) : TODO
+    Returns:
+    """
+    # TODO : more description above
+
     stateList = [ torch.from_numpy(np.concatenate(x,axis=0)) for x in batch["states"]]
     actionsList = [torch.from_numpy(np.concatenate(x,axis=0)) for x in batch["actions"]]
 
@@ -102,23 +142,30 @@ def prepare_data(batch,valueBatch,previousBatch):
     batch["actions"] = torch.cat(actionsList,0)
     batch["rewards"] = torch.cat(rewardsList,0)
     batch["returns"] = torch.cat(returnsList,0)
+
     advantagesList = torch.cat(advantagesList,0)
     batch["advantages"] = (advantagesList- advantagesList.mean()) / advantagesList.std()
 
     valueBatch["states"] = torch.cat(( previousBatch["states"],batch["states"]),0)
     valueBatch["targets"] =  torch.cat((previousBatch["returns"],batch["returns"]),0)
-    # valueBatch["states"] =  previousBatch["states"]
-    # valueBatch["targets"] = previousBatch["returns"]
 
 def update_policy(batch):
+    """ Get advantage , states and action and calls trpo step
+    Parameters:
+    batch (dict of arrays of numpy) : TODO (batch is different than prepare_data by structure)
+    Returns:
+    """
     advantages = batch["advantages"]
     states = batch["states"]
     actions = batch["actions"]
-
-    fixed_log_prob = policy_net.getLogProbabilityDensity(Variable(states),actions).detach()
-    trpo_step(policy_net, states,actions,advantages,fixed_log_prob , args.max_kl, args.damping)
+    trpo_step(policy_net, states,actions,advantages , args.max_kl, args.damping)
 
 def update_value(valueBatch):
+    """ Get valueBatch and run adam optimizer to learn value function
+    Parameters:
+    valueBatch  (dict of arrays of numpy) : TODO
+    Returns:
+    """
     # shuffle the data
     dataSize = valueBatch["targets"].size()[0]
     permutation = torch.randperm(dataSize)
@@ -133,27 +180,21 @@ def update_value(valueBatch):
     for t in range(iter):
         prediction = value_net(input[t*batchSize:t*batchSize+batchSize])
         loss = loss_fn(prediction, target[t*batchSize:t*batchSize+batchSize])
+        # XXX : Comment out for debug
+        # if t%100==0:
+        #     print("\t%f"%loss.data)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-def calculate_loss(reward_sum_mean,reward_sum_std,test_number = 10):
-    rewardSum = []
-    for i in range(test_number):
-        state = env.reset()
-        rewardSum.append(0)
-        for t in range(args.episode_length):
-            state, reward, done, _ = env.step(policy_net.get_action(state)[0] )
-            state = np.transpose(state)
-            rewardSum[-1] += reward
-            if done:
-                break
-    reward_sum_mean.append(np.array(rewardSum).mean())
-    reward_sum_std.append(np.array(rewardSum).std())
-    return reward_sum_mean, reward_sum_std
 
 
 def save_to_previousBatch(previousBatch,batch):
+    """ Save previous batch to use in future value optimization
+    Details: TODO
+    Parameters:
+    Returns:
+    """
     if args.value_memory<0:
         print("Value memory should be equal or greater than zero")
     elif args.value_memory>0:
@@ -175,12 +216,36 @@ def save_to_previousBatch(previousBatch,batch):
         previousBatch["returns"] = previousBatch["returns"][permutation]
 
 
-def signal_handler(sig, frame):
-    print('Closing!!')
-    env.close()
-    sys.exit(0)
+def calculate_loss(reward_sum_mean,reward_sum_std,test_number = 10):
+    """ Calculate mean cummulative reward for test_nubmer of trials
+
+    Parameters:
+    reward_sum_mean (list): holds the history of the means.
+    reward_sum_std (list): holds the history of the std.
+
+    Returns:
+    list: new value appended means
+    list: new value appended stds
+    """
+    rewardSum = []
+    for i in range(test_number):
+        state = env.reset()
+        rewardSum.append(0)
+        for t in range(args.episode_length):
+            state, reward, done, _ = env.step(policy_net.get_action(state)[0] )
+            state = np.transpose(state)
+            rewardSum[-1] += reward
+            if done:
+                break
+    reward_sum_mean.append(np.array(rewardSum).mean())
+    reward_sum_std.append(np.array(rewardSum).std())
+    return reward_sum_mean, reward_sum_std
 
 def log(losses):
+    """ Saves mean and std over episodes in log file
+    Parameters:
+    Returns:
+    """
     # TODO : add duration to log
     filename = args.log_dir+"/"+ args.log_prefix \
              + "_env_" + args.env_name \
@@ -209,13 +274,19 @@ def log(losses):
         spamwriter.writerow(losses)
 
 def main():
+    """
+    Parameters:
+    Returns:
+    """
     signal.signal(signal.SIGINT, signal_handler)
-    print("Start Training")
     time_start = time.time()
 
     reward_sum_mean,reward_sum_std  = [], []
     previousBatch= {"states":torch.Tensor(0) ,
                     "returns":torch.Tensor(0)}
+
+    reward_sum_mean,reward_sum_std = calculate_loss(reward_sum_mean,reward_sum_std)
+    print("Initial loss \n\tloss | mean : %6.4f / std : %6.4f"%(reward_sum_mean[-1],reward_sum_std[-1])  )
 
     for i_episode in range(args.max_iteration_number):
         time_episode_start = time.time()
@@ -230,12 +301,12 @@ def main():
                  "mask":[]}
         valueBatch = {"states" :[],
                       "targets" : []}
-
         num_steps = 0
         while num_steps < args.batch_size:
             state = env.reset()
             reward_sum = 0
             states,actions,rewards,next_states,masks = [],[],[],[],[]
+            steps = 0
             for t in range(args.episode_length):
                 action = policy_net.get_action(state)[0] # agent
                 next_state, reward, done, info = env.step(action)
@@ -250,6 +321,7 @@ def main():
 
                 state = next_state
                 reward_sum += reward
+                steps+=1
                 if args.render:
                     env.render()
                 if done:
@@ -260,9 +332,7 @@ def main():
             batch["next_states"].append(np.expand_dims(next_states, axis=1))
             batch["rewards"].append(rewards)
             batch["mask"].append(masks)
-
-            num_steps += (t-1)
-
+            num_steps += steps
 
         prepare_data(batch,valueBatch,previousBatch)
         update_policy(batch) # First policy update to avoid overfitting
@@ -270,7 +340,6 @@ def main():
 
         save_to_previousBatch(previousBatch,batch)
 
-        print(type(previousBatch["returns"]) )
 
         print("episode %d | total: %.4f "%( i_episode, time.time()-time_episode_start))
         reward_sum_mean,reward_sum_std = calculate_loss(reward_sum_mean,reward_sum_std)
