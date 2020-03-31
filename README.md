@@ -44,7 +44,7 @@ the log code will automatically enumurate the log file names.
 ## Saving the trained networks
 
 
-## Useful Referece
+## Useful Reference
 ### Books
 * ![Reinforcement Learning An Introduction](http://incompleteideas.net/book/RLbook2018.pdf)
 * ![A Survey on Policy Search for Robotics](https://spiral.imperial.ac.uk:8443/bitstream/10044/1/12051/7/fnt_corrected_2014-8-22.pdf)
