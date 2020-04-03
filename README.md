@@ -53,6 +53,7 @@ the log code will automatically enumurate the log file names.
 * ![Trust Region Policy Optimization](http://proceedings.mlr.press/v37/schulman15.pdf)
 * ![High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf)
 * ![Towards Generalization and Simplicity in Continuous Control](http://papers.nips.cc/paper/7233-towards-generalization-and-simplicity-in-continuous-control.pdf)
+* ![Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf)
 
 ## Other TRPO repos
 * ![modular_rl](https://github.com/joschu/modular_rl)
