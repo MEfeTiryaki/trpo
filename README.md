@@ -46,20 +46,20 @@ the log code will automatically enumurate the log file names.
 
 ## Useful Reference
 ### Books
-* ![Reinforcement Learning An Introduction](http://incompleteideas.net/book/RLbook2018.pdf)
-* ![A Survey on Policy Search for Robotics](https://spiral.imperial.ac.uk:8443/bitstream/10044/1/12051/7/fnt_corrected_2014-8-22.pdf)
+* [Reinforcement Learning An Introduction](http://incompleteideas.net/book/RLbook2018.pdf)
+* [A Survey on Policy Search for Robotics](https://spiral.imperial.ac.uk:8443/bitstream/10044/1/12051/7/fnt_corrected_2014-8-22.pdf)
 
 ### Papers
-* ![Trust Region Policy Optimization](http://proceedings.mlr.press/v37/schulman15.pdf)
-* ![High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf)
-* ![Towards Generalization and Simplicity in Continuous Control](http://papers.nips.cc/paper/7233-towards-generalization-and-simplicity-in-continuous-control.pdf)
-* ![Deep Reinforcement Learning that Matters](https://arxiv.org/abs/1709.06560)
+* [Trust Region Policy Optimization](http://proceedings.mlr.press/v37/schulman15.pdf)
+* [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf)
+* [Towards Generalization and Simplicity in Continuous Control](http://papers.nips.cc/paper/7233-towards-generalization-and-simplicity-in-continuous-control.pdf)
+* [Deep Reinforcement Learning that Matters](https://arxiv.org/abs/1709.06560)
 
 ## Other TRPO repos
-* ![modular_rl](https://github.com/joschu/modular_rl)
-* ![pat-coady/trpo](https://github.com/pat-coady/trpo)
-* ![ikostrikov/pytorch-trpo](https://github.com/ikostrikov/pytorch-trpo)
-* ![mjacar/pytorch-trpo](https://github.com/mjacar/pytorch-trpo)
+* [modular_rl](https://github.com/joschu/modular_rl)
+* [pat-coady/trpo](https://github.com/pat-coady/trpo)
+* [ikostrikov/pytorch-trpo](https://github.com/ikostrikov/pytorch-trpo)
+* [mjacar/pytorch-trpo](https://github.com/mjacar/pytorch-trpo)
 
 If there are some other good implementations please inform me to add to the list
 
