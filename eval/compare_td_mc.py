@@ -34,9 +34,12 @@ def main():
 
 
         plt.fill_between(episode,mean-std, mean+std, alpha=0.2)
-    plt.xlabel("Iteration Number")
-    plt.ylabel("Average Total Reward (for 10 run)")
-    plt.legend(["Monte Carlo","Bootstrap"])
+
+    plt.xlabel("Iteration Number",fontsize=18)
+    plt.ylabel("Average Total Reward (for 10 run)",fontsize=18)
+    plt.xticks(fontsize= 15)
+    plt.yticks(fontsize= 15)
+    plt.legend(["Monte Carlo","Temporal Difference"],fontsize=18,loc="lower right")
     plt.grid()
     plt.show()
 

@@ -34,12 +34,13 @@ def main():
 
         episode = np.arange(0,200,1)
         plt.plot(episode,mean)
-
-
         plt.fill_between(episode,mean-std, mean+std, alpha=0.2)
-    plt.xlabel("Iteration Number")
-    plt.ylabel("Average Total Reward (for 10 run)")
-    plt.legend(["2.5k","5k","10k","20k"])
+
+    plt.xlabel("Iteration Number",fontsize=18)
+    plt.ylabel("Average Total Reward (for 10 run)",fontsize=18)
+    plt.xticks(fontsize= 15)
+    plt.yticks(fontsize= 15)
+    plt.legend(["2.5k","5k","10k","20k"],fontsize=18,loc="lower right")
     plt.grid()
     plt.show()
 
